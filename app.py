@@ -16,6 +16,28 @@ model = cv2.dnn.readNetFromCaffe('deploy.prototxt.txt', 'res10_300x300_ssd_iter_
 def home():
     return render_template('index.html')
 
+AGE_BRACKETS = [
+    "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)",
+    "(38-43)", "(48-53)", "(60-100)"
+]
+
+age_net = cv2.dnn.readNetFromCaffe('age_deploy.protoxt.txt', 'age_net.caffemodel')
+def predict_age(face):
+    # Get the dimensions of the face
+    (h, w) = face.shape[:2]
+
+    # Construct a blob from the face and pass it through the age classification model
+    blob = cv2.dnn.blobFromImage(face, 1.0, (227, 227), (78.4263377603, 87.7689143744, 114.895847746), swapRB=False)
+    age_net.setInput(blob)
+    preds = age_net.forward()
+
+    # Get the predicted age bracket index
+    i = np.argmax(preds)
+    age_bracket = AGE_BRACKETS[i]
+
+    # Return the age bracket
+    return age_bracket
+
 @app.route('/image', methods=['POST'])
 def detect_faces():
     # Get the image from the request
@@ -33,13 +55,16 @@ def detect_faces():
     num_faces = detections.shape[2]
     logging.info(f'Detected {num_faces} faces in image')
 
-    # Draw green rectangles around the faces
+    # Draw green rectangles around the faces and print age bracket near each face
     for i in range(num_faces):
         confidence = detections[0, 0, i, 2]
         if confidence > 0.5:
             box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
             (x, y, x_end, y_end) = box.astype('int')
+            face = img[y:y_end, x:x_end]
+            age_bracket = predict_age(face)
             cv2.rectangle(img, (x, y), (x_end, y_end), (0, 255, 0), 2)
+            cv2.putText(img, age_bracket, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
 
     # Convert the processed image back to bytes and return it
     _, img_bytes = cv2.imencode('.png', img)
