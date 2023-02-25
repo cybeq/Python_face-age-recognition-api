@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+
+<body>
+<form>
+		<input type="file" id="image-input">
+		<button type="button" onclick="sendImage()">Upload</button>
+	</form>
+</body>
+<script>
+		function sendImage() {
+			// Get the file input element
+			const input = document.getElementById('image-input');
+
+			// Create a new FormData object
+			const formData = new FormData();
+
+			// Add the selected file to the FormData object
+			formData.append('image', input.files[0]);
+
+			// Create a new XMLHttpRequest object
+			const xhr = new XMLHttpRequest();
+
+			// Set the URL of the Flask API endpoint
+			const url = 'http://127.0.0.1:5000/image';
+			xhr.responseType = 'arraybuffer';
+			// Set the method of the request to POST
+			xhr.open('POST', url, true);
+
+			// When the request completes, convert the response to an image and display it
+			xhr.onload = function() {
+				  if (this.status === 200) {
+					   const imgBytes = new Uint8Array(this.response);
+							const blob = new Blob([imgBytes], { type: 'image/png' });
+
+						  	const image = new Image();
+							      image.src = URL.createObjectURL(blob);
+     						document.body.appendChild(image);
+						  }
+			};
+
+			// Send the request with the FormData object as the payload
+			xhr.send(formData);
+		}
+	</script>
+</html>
