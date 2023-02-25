@@ -17,8 +17,8 @@ def home():
     return render_template('index.html')
 
 AGE_BRACKETS = [
-    "(0-2)", "(4-6)", "(8-12)", "(15-20)", "(25-32)",
-    "(38-43)", "(48-53)", "(60-100)"
+    "(0-4)", "(5-10)", "(11-14)", "(15-20)", "(20-28)",
+    "(29-34)", "(35-45)", "(46-60)", "(61-100)"
 ]
 
 age_net = cv2.dnn.readNetFromCaffe('age_deploy.protoxt.txt', 'age_net.caffemodel')
