@@ -11,3 +11,9 @@ Using machine learning to recognize faces in the uploaded image. The application
 $ sudo pip3 install -r requirements.txt
 $ python app.py
 ```
+
+## docker
+```
+$ sudo docker build -t reco .
+$ sudo docker run -p 5000:5000 reco
+```
