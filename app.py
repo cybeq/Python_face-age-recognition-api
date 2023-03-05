@@ -71,4 +71,4 @@ def detect_faces():
     return img_bytes.tobytes(), 200, {'Content-Type': 'image/png'}
 
 if __name__ == '__main__':
-    app.run(debug=True)
+      app.run(host='0.0.0.0')
